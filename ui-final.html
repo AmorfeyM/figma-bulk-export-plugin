@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Экспорт по секциям</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      font-size: 13px;
+      line-height: 1.4;
+      background: #2c2c2c;
+      color: #ffffff;
+      padding: 16px;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      gap: 16px;
+    }
+
+    .header {
+      text-align: center;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #404040;
+    }
+
+    .header h1 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .sections-info {
+      background: #383838;
+      border-radius: 6px;
+      padding: 12px;
+      border: 1px solid #404040;
+    }
+
+    .sections-count {
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #ffffff;
+    }
+
+    .sections-list {
+      max-height: 120px;
+      overflow-y: auto;
+    }
+
+    .section-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      font-size: 12px;
+      color: #cccccc;
+    }
+
+    .settings {
+      background: #383838;
+      border-radius: 6px;
+      padding: 12px;
+      border: 1px solid #404040;
+    }
+
+    .setting-group {
+      margin-bottom: 12px;
+    }
+
+    .setting-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .setting-label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 500;
+      color: #ffffff;
+    }
+
+    .setting-select, .setting-input {
+      width: 100%;
+      padding: 6px 8px;
+      background: #2c2c2c;
+      border: 1px solid #404040;
+      border-radius: 4px;
+      color: #ffffff;
+      font-size: 12px;
+    }
+
+    .setting-select:focus, .setting-input:focus {
+      outline: none;
+      border-color: #0d99ff;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .checkbox {
+      width: 16px;
+      height: 16px;
+    }
+
+    .progress-section {
+      background: #383838;
+      border-radius: 6px;
+      padding: 12px;
+      border: 1px solid #404040;
+      display: none;
+    }
+
+    .progress-section.visible {
+      display: block;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #2c2c2c;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #0d99ff, #00d4ff);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      text-align: center;
+      font-size: 12px;
+      font-weight: 500;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .progress-details {
+      font-size: 11px;
+      color: #cccccc;
+      text-align: center;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .button {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .button-primary {
+      background: #0d99ff;
+      color: #ffffff;
+    }
+
+    .button-primary:hover:not(:disabled) {
+      background: #0086e6;
+    }
+
+    .button-primary:disabled {
+      background: #404040;
+      color: #808080;
+      cursor: not-allowed;
+    }
+
+    .button-secondary {
+      background: #404040;
+      color: #ffffff;
+    }
+
+    .button-secondary:hover:not(:disabled) {
+      background: #4a4a4a;
+    }
+
+    .button-download {
+      background: #28a745;
+      color: #ffffff;
+      display: none;
+    }
+
+    .button-download.visible {
+      display: block;
+    }
+
+    .button-download:hover {
+      background: #218838;
+    }
+
+    .error-message {
+      background: #dc3545;
+      color: #ffffff;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      display: none;
+    }
+
+    .error-message.visible {
+      display: block;
+    }
+
+    .success-message {
+      background: #28a745;
+      color: #ffffff;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      display: none;
+    }
+
+    .success-message.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Экспорт по секциям</h1>
+    </div>
+
+    <div class="sections-info" id="sectionsInfo">
+      <div class="sections-count" id="sectionsCount">Поиск секций...</div>
+      <div class="sections-list" id="sectionsList"></div>
+    </div>
+
+    <div class="settings">
+      <div class="setting-group">
+        <label class="setting-label" for="formatSelect">Формат экспорта:</label>
+        <select class="setting-select" id="formatSelect">
+          <option value="PNG">PNG</option>
+          <option value="JPG">JPG</option>
+          <option value="SVG">SVG</option>
+        </select>
+      </div>
+
+      <div class="setting-group">
+        <label class="setting-label" for="scaleInput">Масштаб:</label>
+        <select class="setting-select" id="scaleInput">
+          <option value="1">1x</option>
+          <option value="2">2x</option>
+          <option value="3">3x</option>
+        </select>
+      </div>
+
+      <div class="setting-group">
+        <div class="checkbox-group">
+          <input type="checkbox" class="checkbox" id="createZipCheck" checked>
+          <label class="setting-label" for="createZipCheck">Создать ZIP архив</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="progress-section" id="progressSection">
+      <div class="progress-text" id="progressText">0%</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-details" id="progressDetails">Подготовка к экспорту...</div>
+    </div>
+
+    <div class="error-message" id="errorMessage"></div>
+    <div class="success-message" id="successMessage"></div>
+
+    <div class="buttons">
+      <button class="button button-primary" id="exportBtn">Начать экспорт</button>
+      <button class="button button-download" id="downloadBtn">Скачать ZIP</button>
+      <button class="button button-secondary" id="closeBtn">Закрыть</button>
+    </div>
+  </div>
+
+  <script>
+    // Множественные CDN для JSZip
+    const JSZip_CDNS = [
+      'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js',
+      'https://unpkg.com/jszip@3.10.1/dist/jszip.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'
+    ];
+
+    let currentCDNIndex = 0;
+    let JSZipLoaded = false;
+    let sectionsData = [];
+    let exportedData = null;
+    let isExporting = false;
+
+    // Функция загрузки JSZip с резервными CDN
+    function loadJSZip() {
+      return new Promise((resolve, reject) => {
+        if (window.JSZip) {
+          JSZipLoaded = true;
+          resolve(window.JSZip);
+          return;
+        }
+
+        function tryLoadFromCDN(index) {
+          if (index >= JSZip_CDNS.length) {
+            JSZipLoaded = false;
+            reject(new Error('Все CDN недоступны'));
+            return;
+          }
+
+          const script = document.createElement('script');
+          script.src = JSZip_CDNS[index];
+
+          script.onload = () => {
+            if (window.JSZip) {
+              JSZipLoaded = true;
+              console.log(`JSZip загружен с CDN ${index + 1}: ${JSZip_CDNS[index]}`);
+              resolve(window.JSZip);
+            } else {
+              tryLoadFromCDN(index + 1);
+            }
+          };
+
+          script.onerror = () => {
+            console.warn(`CDN ${index + 1} недоступен: ${JSZip_CDNS[index]}`);
+            tryLoadFromCDN(index + 1);
+          };
+
+          document.head.appendChild(script);
+        }
+
+        tryLoadFromCDN(0);
+      });
+    }
+
+    // Элементы DOM
+    const sectionsCount = document.getElementById('sectionsCount');
+    const sectionsList = document.getElementById('sectionsList');
+    const progressSection = document.getElementById('progressSection');
+    const progressText = document.getElementById('progressText');
+    const progressFill = document.getElementById('progressFill');
+    const progressDetails = document.getElementById('progressDetails');
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+    const exportBtn = document.getElementById('exportBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const closeBtn = document.getElementById('closeBtn');
+    const formatSelect = document.getElementById('formatSelect');
+    const scaleInput = document.getElementById('scaleInput');
+    const createZipCheck = document.getElementById('createZipCheck');
+
+    // Функция для показа ошибки
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.classList.add('visible');
+      setTimeout(() => {
+        errorMessage.classList.remove('visible');
+      }, 5000);
+    }
+
+    // Функция для показа успешного сообщения
+    function showSuccess(message) {
+      successMessage.textContent = message;
+      successMessage.classList.add('visible');
+      setTimeout(() => {
+        successMessage.classList.remove('visible');
+      }, 5000);
+    }
+
+    // Обновление прогресса
+    function updateProgress(progress, details) {
+      progressText.textContent = `${progress}%`;
+      progressFill.style.width = `${progress}%`;
+      progressDetails.textContent = details;
+    }
+
+    // Обновление списка секций
+    function updateSectionsList(sections) {
+      sectionsData = sections;
+
+      if (sections.length === 0) {
+        sectionsCount.textContent = 'Секции с фреймами не найдены';
+        sectionsList.innerHTML = '<div class="section-item">Создайте секции в Figma и добавьте в них фреймы</div>';
+        exportBtn.disabled = true;
+        return;
+      }
+
+      const totalFrames = sections.reduce((sum, section) => sum + section.frameCount, 0);
+      sectionsCount.textContent = `Найдено секций: ${sections.length} (${totalFrames} фреймов)`;
+
+      sectionsList.innerHTML = sections.map(section =>
+        `<div class="section-item">
+          <span>${section.name}</span>
+          <span>${section.frameCount} фреймов</span>
+        </div>`
+      ).join('');
+
+      exportBtn.disabled = false;
+    }
+
+    // Создание и скачивание ZIP
+    async function createAndDownloadZip(data) {
+      try {
+        // Попытка загрузить JSZip если еще не загружен
+        if (!JSZipLoaded) {
+          updateProgress(85, 'Загрузка библиотеки ZIP...');
+          await loadJSZip();
+        }
+
+        if (!window.JSZip) {
+          throw new Error('JSZip недоступен');
+        }
+
+        const zip = new JSZip();
+        const format = formatSelect.value.toLowerCase();
+
+        updateProgress(90, 'Создание ZIP архива...');
+
+        for (const [sectionName, frames] of Object.entries(data)) {
+          const sectionFolder = zip.folder(sectionName);
+
+          for (const [frameName, imageBytes] of Object.entries(frames)) {
+            const fileName = `${frameName}.${format}`;
+            sectionFolder.file(fileName, imageBytes);
+          }
+        }
+
+        updateProgress(95, 'Генерация архива...');
+
+        const zipBlob = await zip.generateAsync({
+          type: 'blob',
+          compression: 'DEFLATE',
+          compressionOptions: {
+            level: 6
+          }
+        });
+
+        updateProgress(99, 'Подготовка к скачиванию...');
+
+        const url = URL.createObjectURL(zipBlob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `figma-export-${new Date().toISOString().slice(0, 10)}.zip`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        updateProgress(100, 'ZIP скачан!');
+        showSuccess('ZIP архив успешно скачан!');
+
+      } catch (error) {
+        console.error('Ошибка создания ZIP:', error);
+        showError(`JSZip не загружен. Скачиваем файлы по отдельности...`);
+        downloadFilesIndividually(data);
+      }
+    }
+
+    // Альтернативный способ скачивания - по отдельности
+    function downloadFilesIndividually(data) {
+      try {
+        const format = formatSelect.value.toLowerCase();
+        let fileCount = 0;
+
+        for (const [sectionName, frames] of Object.entries(data)) {
+          for (const [frameName, imageBytes] of Object.entries(frames)) {
+            setTimeout(() => {
+              const blob = new Blob([imageBytes], { type: `image/${format}` });
+              const url = URL.createObjectURL(blob);
+
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `${sectionName}_${frameName}.${format}`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+            }, fileCount * 200);
+
+            fileCount++;
+          }
+        }
+
+        showSuccess(`Скачивание ${fileCount} файлов началось`);
+      } catch (error) {
+        showError(`Ошибка скачивания: ${error.message}`);
+      }
+    }
+
+    // Обработчики событий
+    exportBtn.addEventListener('click', () => {
+      if (isExporting) return;
+
+      isExporting = true;
+      exportBtn.disabled = true;
+      progressSection.classList.add('visible');
+      updateProgress(0, 'Подготовка к экспорту...');
+
+      const settings = {
+        format: formatSelect.value,
+        scale: parseInt(scaleInput.value),
+        createZip: createZipCheck.checked
+      };
+
+      parent.postMessage({
+        pluginMessage: {
+          type: 'start-export',
+          settings: settings
+        }
+      }, '*');
+    });
+
+    downloadBtn.addEventListener('click', async () => {
+      if (exportedData) {
+        await createAndDownloadZip(exportedData);
+      }
+    });
+
+    closeBtn.addEventListener('click', () => {
+      parent.postMessage({
+        pluginMessage: { type: 'close-plugin' }
+      }, '*');
+    });
+
+    // Обработчик сообщений от плагина
+    window.onmessage = (event) => {
+      const msg = event.data.pluginMessage;
+
+      if (msg.type === 'sections-found') {
+        updateSectionsList(msg.sections);
+      }
+
+      if (msg.type === 'export-progress') {
+        updateProgress(msg.progress, `${msg.currentSection} - ${msg.currentFrame}`);
+      }
+
+      if (msg.type === 'export-complete') {
+        exportedData = msg.data;
+        isExporting = false;
+        exportBtn.disabled = false;
+        updateProgress(100, 'Экспорт завершен!');
+
+        if (createZipCheck.checked) {
+          downloadBtn.classList.add('visible');
+          showSuccess('Экспорт завершен! Нажмите "Скачать ZIP".');
+        } else {
+          showSuccess('Экспорт завершен!');
+        }
+      }
+
+      if (msg.type === 'export-error') {
+        isExporting = false;
+        exportBtn.disabled = false;
+        progressSection.classList.remove('visible');
+        showError(msg.message);
+      }
+    };
+
+    // Предварительная загрузка JSZip при инициализации
+    loadJSZip()
+      .then(() => {
+        console.log('✅ JSZip предзагружен успешно');
+        JSZipLoaded = true;
+      })
+      .catch(error => {
+        console.warn('⚠️ JSZip не удалось предзагрузить:', error.message);
+        JSZipLoaded = false;
+      });
+
+    // Инициализация - запрос списка секций
+    parent.postMessage({
+      pluginMessage: { type: 'get-sections' }
+    }, '*');
+  </script>
+</body>
+</html>
