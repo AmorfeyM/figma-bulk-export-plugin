@@ -1,6 +1,12 @@
 # Bulk Export by Sections - Figma Plugin
 
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/AmorfeyM/figma-bulk-export-plugin)
+[![Figma](https://img.shields.io/badge/Figma-Plugin-orange?style=for-the-badge&logo=figma)](https://figma.com)
+[![License](https://img.shields.io/badge/License-Internal_Use-blue?style=for-the-badge)](#)
+
 Автоматизированный экспорт фреймов из Figma по секциям с поддержкой прогресс-бара и создания ZIP-архивов.
+
+🔗 **GitHub**: https://github.com/AmorfeyM/figma-bulk-export-plugin
 
 ## Описание
 
@@ -18,13 +24,24 @@
 
 ## Установка
 
-### Вариант 1: Установка из кода (Рекомендуется)
+### Вариант 1: Установка из GitHub (Рекомендуется)
 
-1. Скачайте все файлы проекта
-2. Откройте Figma Desktop App
-3. Перейдите в меню `Plugins` → `Development` → `Import plugin from manifest...`
-4. Выберите файл `manifest.json` из папки проекта
-5. Плагин появится в списке доступных плагинов
+1. **Скачайте проект**:
+   - Перейдите на https://github.com/AmorfeyM/figma-bulk-export-plugin
+   - Нажмите `Code` → `Download ZIP`
+   - Распакуйте архив
+2. **Откройте Figma Desktop App**
+3. **Импортируйте плагин**: `Plugins` → `Development` → `Import plugin from manifest...`
+4. **Выберите файл** `manifest.json` из распакованной папки
+5. **Готово!** Плагин появится в списке
+
+### Вариант 2: Клонирование через Git
+
+```bash
+git clone https://github.com/AmorfeyM/figma-bulk-export-plugin.git
+cd figma-bulk-export-plugin
+```
+Затем импортируйте `manifest.json` в Figma
 
 ### Альтернативный манифест
 
