@@ -1,0 +1,18 @@
+{
+  "name": "Bulk Export by Sections",
+  "id": "bulk-export-sections",
+  "api": "1.0.0",
+  "main": "code-simple.js",
+  "ui": "ui-final.html",
+  "editorType": [
+    "figma",
+    "figjam"
+  ],
+  "networkAccess": {
+    "allowedDomains": [
+      "https://cdn.jsdelivr.net",
+      "https://unpkg.com",
+      "https://cdnjs.cloudflare.com"
+    ]
+  }
+}
