@@ -1,58 +1,42 @@
-// Конфигурация Figma Plugin для системы подписки
-// Замените значения на реальные данные вашего Supabase проекта
+// ⚠️ ВАЖНО: Замените эти данные на ваши реальные из Supabase Dashboard
+// Settings → API → Project URL и API Keys
 
 const PLUGIN_CONFIG = {
-  // Supabase настройки - ОБНОВИТЕ ДАННЫМИ ИЗ ВАШЕГО ПРОЕКТА
+  // Supabase настройки - ЗАМЕНИТЕ НА ВАШИ ДАННЫЕ
   SUPABASE: {
     URL: 'https://your-project-id.supabase.co', // Замените на ваш Project URL
-    ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.your_anon_key_here', // Замените на ваш anon key
-    SERVICE_ROLE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.your_service_role_key_here' // Для backend
+    ANON_KEY: 'your_anon_key_here', // Замените на ваш anon public key
+    SERVICE_ROLE_KEY: 'your_service_role_key_here' // Замените на ваш service role key
   },
 
   // API Endpoints
   API: {
     VERIFY_SUBSCRIPTION: '/functions/v1/verify-subscription',
     // YooKassa временно отключена
-    YOOKASSA_WEBHOOK: '/functions/v1/yookassa-webhook', // ЗАГЛУШКА
-    CREATE_PAYMENT: '/functions/v1/create-payment' // ЗАГЛУШКА
+    YOOKASSA_WEBHOOK: '/functions/v1/yookassa-webhook',
+    CREATE_PAYMENT: '/functions/v1/create-payment'
   },
 
-  // YooKassa настройки (ЗАГЛУШКА - пока не используется)
+  // YooKassa настройки (ЗАГЛУШКА)
   YOOKASSA: {
-    ENABLED: false, // Отключаем YooKassa
+    ENABLED: false, // Отключаем YooKassa пока
     SHOP_ID: 'demo_shop_id',
-    SECRET_KEY: 'demo_secret_key',
-    WEBHOOK_URL: 'https://your-project.supabase.co/functions/v1/yookassa-webhook'
+    SECRET_KEY: 'demo_secret_key'
   },
 
   // Настройки плагина
   PLUGIN: {
     VERSION: '2.1.0',
     NAME: 'Figma Bulk Export by Sections',
-    CACHE_DURATION: 7 * 24 * 60 * 60 * 1000, // 7 дней в миллисекундах
-    DEMO_MODE: true // Включаем демо-режим пока нет YooKassa
+    CACHE_DURATION: 7 * 24 * 60 * 60 * 1000, // 7 дней
+    DEMO_MODE: false // Отключаем демо-режим для продакшн
   },
 
   // Планы подписки
   PLANS: {
-    monthly: {
-      name: 'Месячная подписка',
-      duration: 30,
-      price: 500,
-      currency: 'RUB'
-    },
-    quarterly: {
-      name: 'Квартальная подписка',
-      duration: 90,
-      price: 1200,
-      currency: 'RUB'
-    },
-    yearly: {
-      name: 'Годовая подписка',
-      duration: 365,
-      price: 4000,
-      currency: 'RUB'
-    }
+    monthly: { name: 'Месячная подписка', duration: 30, price: 500, currency: 'RUB' },
+    quarterly: { name: 'Квартальная подписка', duration: 90, price: 1200, currency: 'RUB' },
+    yearly: { name: 'Годовая подписка', duration: 365, price: 4000, currency: 'RUB' }
   },
 
   // Сообщения для пользователей
@@ -68,7 +52,7 @@ const PLUGIN_CONFIG = {
 
   // Админ-панель
   ADMIN: {
-    ACCESS_KEY: 'admin-demo-key-change-this', // ИЗМЕНИТЕ НА СВОЙ КЛЮЧ
+    ACCESS_KEY: 'admin-change-this-key-123', // ИЗМЕНИТЕ НА СЛОЖНЫЙ КЛЮЧ
     ALLOWED_EMAILS: ['admin@yourcompany.com'] // ДОБАВЬТЕ СВОЮ ПОЧТУ
   }
 };
@@ -91,36 +75,34 @@ function getAuthHeaders(useServiceRole = false) {
   };
 }
 
-// ИСПРАВЛЕННАЯ функция проверки конфигурации
+// Функция проверки конфигурации
 function isConfigured() {
-  // Проверяем, что URL не содержит заглушки
   const hasValidUrl = PLUGIN_CONFIG.SUPABASE.URL &&
                       !PLUGIN_CONFIG.SUPABASE.URL.includes('your-project-id') &&
                       PLUGIN_CONFIG.SUPABASE.URL.includes('.supabase.co');
 
-  // Проверяем, что anon key не заглушка и имеет правильный формат JWT
   const hasValidAnonKey = PLUGIN_CONFIG.SUPABASE.ANON_KEY &&
                           !PLUGIN_CONFIG.SUPABASE.ANON_KEY.includes('your_anon_key') &&
                           PLUGIN_CONFIG.SUPABASE.ANON_KEY.startsWith('eyJ') &&
                           PLUGIN_CONFIG.SUPABASE.ANON_KEY.length > 100;
 
-  // Проверяем админ настройки
-  const hasValidAdmin = PLUGIN_CONFIG.ADMIN.ACCESS_KEY &&
-                        !PLUGIN_CONFIG.ADMIN.ACCESS_KEY.includes('change-this') &&
-                        PLUGIN_CONFIG.ADMIN.ACCESS_KEY.length > 10;
+  const hasValidServiceKey = PLUGIN_CONFIG.SUPABASE.SERVICE_ROLE_KEY &&
+                             !PLUGIN_CONFIG.SUPABASE.SERVICE_ROLE_KEY.includes('your_service_role') &&
+                             PLUGIN_CONFIG.SUPABASE.SERVICE_ROLE_KEY.startsWith('eyJ') &&
+                             PLUGIN_CONFIG.SUPABASE.SERVICE_ROLE_KEY.length > 100;
 
   return {
-    isValid: hasValidUrl && hasValidAnonKey && hasValidAdmin,
+    isValid: hasValidUrl && hasValidAnonKey && hasValidServiceKey,
     details: {
       supabaseUrl: hasValidUrl,
       anonKey: hasValidAnonKey,
-      adminKey: hasValidAdmin,
+      serviceKey: hasValidServiceKey,
       yookassaEnabled: PLUGIN_CONFIG.YOOKASSA.ENABLED
     }
   };
 }
 
-// Функция для проверки подключения к Supabase
+// Функция тестирования подключения
 async function testSupabaseConnection() {
   try {
     const response = await fetch(PLUGIN_CONFIG.SUPABASE.URL + '/rest/v1/', {

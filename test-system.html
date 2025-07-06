@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Тест системы подписки Figma Plugin</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section h2 {
+            color: #333;
+            margin-top: 0;
+        }
+        .status {
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.warning { background: #fff3cd; color: #856404; }
+        .status.info { background: #d1ecf1; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        button.success { background: #28a745; }
+        button.success:hover { background: #218838; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .demo-license {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #ffc107;
+            margin: 10px 0;
+        }
+        .demo-license strong {
+            font-family: monospace;
+            background: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Тест системы подписки Figma Plugin</h1>
+
+    <!-- Конфигурация -->
+    <div class="test-section">
+        <h2>1. Проверка конфигурации</h2>
+        <div id="config-status"></div>
+        <button onclick="checkConfig()">Проверить конфиг</button>
+        <button onclick="showConfigDetails()">Показать детали</button>
+        <div id="config-details"></div>
+    </div>
+
+    <!-- Тестовые лицензии -->
+    <div class="test-section">
+        <h2>2. Тестовые лицензии</h2>
+        <div class="demo-license">
+            <strong>Демо-лицензии для тестирования:</strong><br>
+            📧 Email: <strong>demo@example.com</strong><br>
+            🔑 Ключ: <strong>DEMO-123456-ABCD</strong><br>
+            ⏰ Действует: 30 дней<br><br>
+
+            📧 Email: <strong>test@company.com</strong><br>
+            🔑 Ключ: <strong>TEST-789012-EFGH</strong><br>
+            ⏰ Действует: 365 дней
+        </div>
+        <button onclick="generateTestLicense()" class="success">Сгенерировать новую</button>
+        <div id="test-license-result"></div>
+    </div>
+
+    <!-- Подключение к Supabase -->
+    <div class="test-section">
+        <h2>3. Подключение к Supabase</h2>
+        <div id="supabase-status"></div>
+        <button onclick="testSupabaseConnection()">Тест подключения</button>
+        <button onclick="testSubscriptionAPI()">Тест API подписки</button>
+        <div id="supabase-result"></div>
+    </div>
+
+    <!-- Симуляция плагина -->
+    <div class="test-section">
+        <h2>4. Симуляция работы плагина</h2>
+        <div>
+            <input type="email" id="test-email" placeholder="Email" value="demo@example.com">
+            <input type="text" id="test-license" placeholder="Лицензионный ключ" value="DEMO-123456-ABCD">
+            <br><br>
+            <button onclick="simulateSubscriptionCheck()">Проверить подписку</button>
+            <button onclick="simulatePaymentRequest()">Симулировать покупку</button>
+        </div>
+        <div id="plugin-simulation-result"></div>
+    </div>
+
+    <!-- Админ-панель -->
+    <div class="test-section">
+        <h2>5. Админ-панель</h2>
+        <div>
+            <p>Открыть админ-панель в новой вкладке:</p>
+            <button onclick="openAdminPanel()">Открыть админ-панель</button>
+            <div class="demo-license">
+                <strong>Доступ к админ-панели:</strong><br>
+                🔑 Ключ: <strong>admin-demo-key-change-this</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- Логи -->
+    <div class="test-section">
+        <h2>6. Логи тестирования</h2>
+        <button onclick="clearLogs()">Очистить логи</button>
+        <pre id="test-logs"></pre>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        // Загрузка конфигурации
+        let CONFIG = {
+            SUPABASE_URL: 'https://your-project-id.supabase.co',
+            SUPABASE_ANON_KEY: 'your_anon_key_here',
+            DEMO_MODE: true
+        };
+
+        if (typeof PLUGIN_CONFIG !== 'undefined') {
+            CONFIG = {
+                SUPABASE_URL: PLUGIN_CONFIG.SUPABASE.URL,
+                SUPABASE_ANON_KEY: PLUGIN_CONFIG.SUPABASE.ANON_KEY,
+                DEMO_MODE: PLUGIN_CONFIG.PLUGIN.DEMO_MODE
+            };
+        }
+
+        // Утилиты для логирования
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logElement = document.getElementById('test-logs');
+            logElement.textContent += `[${timestamp}] ${type.toUpperCase()}: ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(`[TEST] ${message}`);
+        }
+
+        function showStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        // 1. Проверка конфигурации
+        function checkConfig() {
+            log('Проверяем конфигурацию...');
+
+            const isConfigured = !CONFIG.SUPABASE_URL.includes('your-project-id') &&
+                               !CONFIG.SUPABASE_ANON_KEY.includes('your_anon_key') &&
+                               CONFIG.SUPABASE_URL.includes('.supabase.co');
+
+            if (isConfigured) {
+                showStatus('config-status', '✅ Конфигурация настроена правильно', 'success');
+                log('Конфигурация: OK');
+            } else {
+                showStatus('config-status', '⚠️ Конфигурация использует демо-данные', 'warning');
+                log('Конфигурация: Демо-режим');
+            }
+        }
+
+        function showConfigDetails() {
+            const details = `
+                <pre>
+URL: ${CONFIG.SUPABASE_URL}
+API Key: ${CONFIG.SUPABASE_ANON_KEY.substring(0, 20)}...
+Demo Mode: ${CONFIG.DEMO_MODE}
+Configured: ${!CONFIG.SUPABASE_URL.includes('your-project-id')}
+                </pre>
+            `;
+            document.getElementById('config-details').innerHTML = details;
+            log('Показаны детали конфигурации');
+        }
+
+        // 2. Генерация тестовых лицензий
+        function generateTestLicense() {
+            const timestamp = Date.now().toString().slice(-6);
+            const random = Math.random().toString(36).substr(2, 8).toUpperCase();
+            const testLicense = `TEST-${timestamp}-${random}`;
+            const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+            const result = `
+                <div class="demo-license">
+                    <strong>Новая тестовая лицензия:</strong><br>
+                    📧 Email: <strong>test@demo.com</strong><br>
+                    🔑 Ключ: <strong>${testLicense}</strong><br>
+                    ⏰ Действует до: ${expires.toLocaleDateString()}
+                </div>
+            `;
+            document.getElementById('test-license-result').innerHTML = result;
+            log(`Сгенерирована тестовая лицензия: ${testLicense}`);
+        }
+
+        // 3. Тест подключения к Supabase
+        async function testSupabaseConnection() {
+            log('Тестируем подключение к Supabase...');
+
+            if (CONFIG.SUPABASE_URL.includes('your-project-id')) {
+                showStatus('supabase-status', '⚠️ Supabase не настроен - используется демо-режим', 'warning');
+                log('Supabase: Демо-режим');
+                return;
+            }
+
+            try {
+                const response = await fetch(CONFIG.SUPABASE_URL + '/rest/v1/', {
+                    method: 'HEAD',
+                    headers: {
+                        'apikey': CONFIG.SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${CONFIG.SUPABASE_ANON_KEY}`
+                    }
+                });
+
+                if (response.ok) {
+                    showStatus('supabase-status', '✅ Подключение к Supabase успешно', 'success');
+                    log('Supabase: Подключение OK');
+                } else {
+                    showStatus('supabase-status', `❌ Ошибка подключения: ${response.status}`, 'error');
+                    log(`Supabase: Ошибка ${response.status}`);
+                }
+            } catch (error) {
+                showStatus('supabase-status', `❌ Ошибка сети: ${error.message}`, 'error');
+                log(`Supabase: Ошибка сети - ${error.message}`);
+            }
+        }
+
+        async function testSubscriptionAPI() {
+            log('Тестируем API верификации подписки...');
+
+            if (CONFIG.SUPABASE_URL.includes('your-project-id')) {
+                showStatus('supabase-result', '⚠️ API тест пропущен - Supabase не настроен', 'warning');
+                return;
+            }
+
+            try {
+                // Сначала попробуем SQL функцию
+                log('Тестируем SQL функцию verify_subscription...');
+
+                const sqlResponse = await fetch(CONFIG.SUPABASE_URL + '/rest/v1/rpc/verify_subscription', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': CONFIG.SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${CONFIG.SUPABASE_ANON_KEY}`
+                    },
+                    body: JSON.stringify({
+                        p_email: 'test@demo.com',
+                        p_license_key: 'TEST-123456-DEMO',
+                        p_device_fingerprint: 'test-device-123'
+                    })
+                });
+
+                if (sqlResponse.ok) {
+                    const result = await sqlResponse.json();
+                    console.log('SQL Function result:', result);
+
+                    if (result && typeof result === 'object' && result.valid !== undefined) {
+                        showStatus('supabase-result', '✅ SQL функция verify_subscription работает', 'success');
+                        log('SQL функция: Работает корректно');
+                        return;
+                    }
+                }
+
+                // Если SQL функция не работает, пробуем Edge Function
+                log('SQL функция недоступна, тестируем Edge Function...');
+
+                const edgeResponse = await fetch(CONFIG.SUPABASE_URL + '/functions/v1/verify-subscription', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': CONFIG.SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${CONFIG.SUPABASE_ANON_KEY}`
+                    },
+                    body: JSON.stringify({
+                        email: 'test@demo.com',
+                        license_key: 'TEST-123456-DEMO',
+                        device_fingerprint: 'test-device-123'
+                    })
+                });
+
+                if (edgeResponse.ok) {
+                    const edgeResult = await edgeResponse.json();
+                    console.log('Edge Function result:', edgeResult);
+                    showStatus('supabase-result', '✅ Edge Function verify-subscription работает', 'success');
+                    log('Edge Function: Работает корректно');
+                } else {
+                    showStatus('supabase-result', '⚠️ Ни SQL функция, ни Edge Function не настроены. Выполните SQL из supabase-functions-alternative.sql', 'warning');
+                    log('API: Функции не настроены');
+                }
+            } catch (error) {
+                showStatus('supabase-result', `❌ Ошибка запроса: ${error.message}`, 'error');
+                log(`API подписки: Ошибка запроса - ${error.message}`);
+            }
+        }
+
+        // 4. Симуляция плагина
+        async function simulateSubscriptionCheck() {
+            const email = document.getElementById('test-email').value;
+            const license = document.getElementById('test-license').value;
+
+            log(`Симулируем проверку подписки для ${email}...`);
+
+            if (!email || !license) {
+                showStatus('plugin-simulation-result', '❌ Введите email и лицензионный ключ', 'error');
+                return;
+            }
+
+            // Симуляция проверки подписки
+            const demoLicenses = ['DEMO-123456-ABCD', 'TEST-789012-EFGH'];
+            const isValidDemo = demoLicenses.includes(license);
+
+            if (isValidDemo) {
+                const result = `
+                    <div class="status success">
+                        ✅ Подписка активна<br>
+                        📧 Email: ${email}<br>
+                        🔑 Ключ: ${license}<br>
+                        ⏰ Истекает: ${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+                    </div>
+                `;
+                document.getElementById('plugin-simulation-result').innerHTML = result;
+                log('Подписка: Валидна (демо)');
+            } else {
+                showStatus('plugin-simulation-result', '❌ Подписка не найдена или истекла', 'error');
+                log('Подписка: Не найдена');
+            }
+        }
+
+        function simulatePaymentRequest() {
+            const email = document.getElementById('test-email').value;
+
+            log(`Симулируем запрос на покупку подписки для ${email}...`);
+
+            const result = `
+                <div class="status warning">
+                    💳 Покупка подписки временно недоступна<br><br>
+                    📋 Ваш запрос:<br>
+                    • Email: ${email}<br>
+                    • План: Месячная подписка (500₽)<br><br>
+                    📞 Для покупки обратитесь к администратору<br>
+                    🔑 В демо-режиме используйте тестовые лицензии
+                </div>
+            `;
+            document.getElementById('plugin-simulation-result').innerHTML = result;
+            log('Покупка: Демо-режим (YooKassa отключена)');
+        }
+
+        // 5. Админ-панель
+        function openAdminPanel() {
+            window.open('admin-panel.html', '_blank');
+            log('Открыта админ-панель в новой вкладке');
+        }
+
+        // 6. Логи
+        function clearLogs() {
+            document.getElementById('test-logs').textContent = '';
+            log('Логи очищены');
+        }
+
+        // Автоматический запуск тестов при загрузке
+        window.onload = function() {
+            log('Система тестирования загружена');
+            checkConfig();
+
+            setTimeout(() => {
+                if (!CONFIG.SUPABASE_URL.includes('your-project-id')) {
+                    testSupabaseConnection();
+                }
+            }, 1000);
+        };
+    </script>
+</body>
+</html>

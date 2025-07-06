@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Настройка конфигурации Figma Plugin</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .setup-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+        input[type="text"], input[type="url"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: monospace;
+            box-sizing: border-box;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+        .key-input {
+            font-size: 12px;
+            background: #f8f9fa;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            margin-right: 10px;
+        }
+        button:hover { background: #0056b3; }
+        button.success { background: #28a745; }
+        button.success:hover { background: #218838; }
+        button.test { background: #17a2b8; }
+        button.test:hover { background: #138496; }
+        .status {
+            padding: 12px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.warning { background: #fff3cd; color: #856404; }
+        .status.info { background: #d1ecf1; color: #0c5460; }
+        .help-text {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+        .step {
+            background: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #007bff;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .step h3 {
+            margin: 0 0 10px 0;
+            color: #007bff;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+            border: 1px solid #e9ecef;
+        }
+        .generated-config {
+            display: none;
+            margin-top: 20px;
+        }
+        .copy-button {
+            background: #6c757d;
+            font-size: 12px;
+            padding: 8px 12px;
+        }
+        .copy-button:hover { background: #5a6268; }
+    </style>
+</head>
+<body>
+    <div class="setup-container">
+        <h1>🔧 Настройка конфигурации Figma Plugin</h1>
+        <p class="subtitle">
+            Введите данные вашего Supabase проекта для настройки системы подписки.
+            Эти данные можно найти в Supabase Dashboard → Settings → API.
+        </p>
+
+        <!-- Инструкция -->
+        <div class="step">
+            <h3>📋 Где найти данные Supabase:</h3>
+            <ol>
+                <li>Откройте <a href="https://supabase.com/dashboard" target="_blank">Supabase Dashboard</a></li>
+                <li>Выберите ваш проект</li>
+                <li>Перейдите в <strong>Settings → API</strong></li>
+                <li>Скопируйте нужные данные</li>
+            </ol>
+        </div>
+
+        <!-- Форма настройки -->
+        <form id="configForm">
+            <div class="form-group">
+                <label for="projectUrl">Project URL:</label>
+                <input type="url" id="projectUrl" placeholder="https://your-project.supabase.co" required>
+                <div class="help-text">URL вашего Supabase проекта</div>
+            </div>
+
+            <div class="form-group">
+                <label for="anonKey">anon public key:</label>
+                <textarea id="anonKey" rows="3" class="key-input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." required></textarea>
+                <div class="help-text">Публичный ключ для клиентских запросов</div>
+            </div>
+
+            <div class="form-group">
+                <label for="serviceKey">service_role secret key:</label>
+                <textarea id="serviceKey" rows="3" class="key-input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." required></textarea>
+                <div class="help-text">Секретный ключ для административных операций</div>
+            </div>
+
+            <div class="form-group">
+                <label for="adminKey">Админ-ключ для панели управления:</label>
+                <input type="text" id="adminKey" placeholder="my-secure-admin-key-2024" required>
+                <div class="help-text">Придумайте сложный ключ для доступа к админ-панели</div>
+            </div>
+
+            <div>
+                <button type="button" onclick="testConnection()" class="test">🔍 Тест подключения</button>
+                <button type="button" onclick="generateConfig()" class="success">💾 Сгенерировать конфиг</button>
+                <button type="button" onclick="downloadConfig()">📥 Скачать config.js</button>
+            </div>
+        </form>
+
+        <!-- Статус -->
+        <div id="status"></div>
+
+        <!-- Сгенерированная конфигурация -->
+        <div id="generatedConfig" class="generated-config">
+            <h3>📄 Сгенерированная конфигурация:</h3>
+            <button type="button" onclick="copyConfig()" class="copy-button">📋 Копировать</button>
+            <pre id="configOutput"></pre>
+        </div>
+
+        <!-- Следующие шаги -->
+        <div class="step">
+            <h3>🚀 Следующие шаги:</h3>
+            <ol>
+                <li><strong>Сохраните конфигурацию</strong> - замените содержимое config.js</li>
+                <li><strong>Создайте таблицы</strong> - выполните SQL из supabase-setup.md</li>
+                <li><strong>Протестируйте систему</strong> - откройте test-system.html</li>
+                <li><strong>Запустите плагин</strong> - импортируйте в Figma</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        let currentConfig = {};
+
+        // Тест подключения
+        async function testConnection() {
+            const projectUrl = document.getElementById('projectUrl').value.trim();
+            const anonKey = document.getElementById('anonKey').value.trim();
+
+            if (!projectUrl || !anonKey) {
+                showStatus('Введите Project URL и anon key для тестирования', 'error');
+                return;
+            }
+
+            showStatus('🔄 Тестируем подключение...', 'info');
+
+            try {
+                const response = await fetch(projectUrl + '/rest/v1/', {
+                    method: 'HEAD',
+                    headers: {
+                        'apikey': anonKey,
+                        'Authorization': `Bearer ${anonKey}`
+                    }
+                });
+
+                if (response.ok) {
+                    showStatus('✅ Подключение к Supabase успешно!', 'success');
+
+                    // Тест таблиц
+                    setTimeout(async () => {
+                        try {
+                            const tableResponse = await fetch(projectUrl + '/rest/v1/subscriptions?select=id&limit=1', {
+                                method: 'GET',
+                                headers: {
+                                    'apikey': anonKey,
+                                    'Authorization': `Bearer ${anonKey}`,
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+
+                            if (tableResponse.ok) {
+                                showStatus('✅ Подключение успешно! Таблица subscriptions найдена.', 'success');
+                            } else {
+                                showStatus('⚠️ Подключение успешно, но таблица subscriptions не найдена. Выполните SQL из supabase-setup.md', 'warning');
+                            }
+                        } catch (e) {
+                            showStatus('✅ Подключение успешно! Не удалось проверить таблицы.', 'success');
+                        }
+                    }, 1000);
+                } else {
+                    showStatus(`❌ Ошибка подключения: ${response.status} ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`❌ Ошибка сети: ${error.message}`, 'error');
+            }
+        }
+
+        // Генерация конфигурации
+        function generateConfig() {
+            const projectUrl = document.getElementById('projectUrl').value.trim();
+            const anonKey = document.getElementById('anonKey').value.trim();
+            const serviceKey = document.getElementById('serviceKey').value.trim();
+            const adminKey = document.getElementById('adminKey').value.trim();
+
+            if (!projectUrl || !anonKey || !serviceKey || !adminKey) {
+                showStatus('Заполните все поля для генерации конфигурации', 'error');
+                return;
+            }
+
+            currentConfig = {
+                projectUrl,
+                anonKey,
+                serviceKey,
+                adminKey
+            };
+
+            const configContent = `// Конфигурация Figma Plugin - АВТОГЕНЕРАЦИЯ ${new Date().toISOString()}
+
+const PLUGIN_CONFIG = {
+  // Supabase настройки
+  SUPABASE: {
+    URL: '${projectUrl}',
+    ANON_KEY: '${anonKey}',
+    SERVICE_ROLE_KEY: '${serviceKey}'
+  },
+
+  // API Endpoints
+  API: {
+    VERIFY_SUBSCRIPTION: '/functions/v1/verify-subscription',
+    YOOKASSA_WEBHOOK: '/functions/v1/yookassa-webhook',
+    CREATE_PAYMENT: '/functions/v1/create-payment'
+  },
+
+  // YooKassa настройки (пока отключена)
+  YOOKASSA: {
+    ENABLED: false,
+    SHOP_ID: 'demo_shop_id',
+    SECRET_KEY: 'demo_secret_key'
+  },
+
+  // Настройки плагина
+  PLUGIN: {
+    VERSION: '2.1.0',
+    NAME: 'Figma Bulk Export by Sections',
+    CACHE_DURATION: 7 * 24 * 60 * 60 * 1000, // 7 дней
+    DEMO_MODE: false // Продакшн режим
+  },
+
+  // Планы подписки
+  PLANS: {
+    monthly: { name: 'Месячная подписка', duration: 30, price: 500, currency: 'RUB' },
+    quarterly: { name: 'Квартальная подписка', duration: 90, price: 1200, currency: 'RUB' },
+    yearly: { name: 'Годовая подписка', duration: 365, price: 4000, currency: 'RUB' }
+  },
+
+  // Сообщения для пользователей
+  MESSAGES: {
+    SUBSCRIPTION_REQUIRED: 'Для использования плагина необходима активная подписка',
+    SUBSCRIPTION_EXPIRED: 'Ваша подписка истекла. Продлите подписку для продолжения работы',
+    DEVICE_ALREADY_USED: 'Лицензия уже активирована на другом устройстве',
+    NETWORK_ERROR: 'Ошибка сети. Плагин работает в офлайн режиме',
+    INVALID_LICENSE: 'Неверный лицензионный ключ или email',
+    SUCCESS_ACTIVATION: 'Подписка успешно активирована!',
+    YOOKASSA_DISABLED: 'Покупка подписки временно недоступна. Обратитесь к администратору.'
+  },
+
+  // Админ-панель
+  ADMIN: {
+    ACCESS_KEY: '${adminKey}',
+    ALLOWED_EMAILS: ['admin@yourcompany.com']
+  }
+};
+
+// Функция для получения полного URL API
+function getApiUrl(endpoint) {
+  return PLUGIN_CONFIG.SUPABASE.URL + PLUGIN_CONFIG.API[endpoint];
+}
+
+// Функция для получения заголовков аутентификации
+function getAuthHeaders(useServiceRole = false) {
+  const key = useServiceRole ?
+    PLUGIN_CONFIG.SUPABASE.SERVICE_ROLE_KEY :
+    PLUGIN_CONFIG.SUPABASE.ANON_KEY;
+
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': \`Bearer \${key}\`,
+    'apikey': key
+  };
+}
+
+// Функция проверки конфигурации
+function isConfigured() {
+  const hasValidUrl = PLUGIN_CONFIG.SUPABASE.URL &&
+                      !PLUGIN_CONFIG.SUPABASE.URL.includes('your-project-id') &&
+                      PLUGIN_CONFIG.SUPABASE.URL.includes('.supabase.co');
+
+  const hasValidAnonKey = PLUGIN_CONFIG.SUPABASE.ANON_KEY &&
+                          !PLUGIN_CONFIG.SUPABASE.ANON_KEY.includes('your_anon_key') &&
+                          PLUGIN_CONFIG.SUPABASE.ANON_KEY.startsWith('eyJ') &&
+                          PLUGIN_CONFIG.SUPABASE.ANON_KEY.length > 100;
+
+  const hasValidServiceKey = PLUGIN_CONFIG.SUPABASE.SERVICE_ROLE_KEY &&
+                             !PLUGIN_CONFIG.SUPABASE.SERVICE_ROLE_KEY.includes('your_service_role') &&
+                             PLUGIN_CONFIG.SUPABASE.SERVICE_ROLE_KEY.startsWith('eyJ') &&
+                             PLUGIN_CONFIG.SUPABASE.SERVICE_ROLE_KEY.length > 100;
+
+  return {
+    isValid: hasValidUrl && hasValidAnonKey && hasValidServiceKey,
+    details: {
+      supabaseUrl: hasValidUrl,
+      anonKey: hasValidAnonKey,
+      serviceKey: hasValidServiceKey,
+      yookassaEnabled: PLUGIN_CONFIG.YOOKASSA.ENABLED
+    }
+  };
+}
+
+// Функция тестирования подключения
+async function testSupabaseConnection() {
+  try {
+    const response = await fetch(PLUGIN_CONFIG.SUPABASE.URL + '/rest/v1/', {
+      method: 'HEAD',
+      headers: getAuthHeaders()
+    });
+
+    return {
+      success: response.ok,
+      status: response.status,
+      statusText: response.statusText
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
+// Экспорт для использования в других файлах
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    PLUGIN_CONFIG,
+    getApiUrl,
+    getAuthHeaders,
+    isConfigured,
+    testSupabaseConnection
+  };
+}
+
+// Глобальные переменные для браузера
+if (typeof window !== 'undefined') {
+  window.PLUGIN_CONFIG = PLUGIN_CONFIG;
+  window.getApiUrl = getApiUrl;
+  window.getAuthHeaders = getAuthHeaders;
+  window.isConfigured = isConfigured;
+  window.testSupabaseConnection = testSupabaseConnection;
+}`;
+
+            document.getElementById('configOutput').textContent = configContent;
+            document.getElementById('generatedConfig').style.display = 'block';
+
+            showStatus('✅ Конфигурация сгенерирована! Скопируйте и сохраните в config.js', 'success');
+        }
+
+        // Копирование конфигурации
+        function copyConfig() {
+            const configText = document.getElementById('configOutput').textContent;
+            navigator.clipboard.writeText(configText).then(() => {
+                showStatus('📋 Конфигурация скопирована в буфер обмена!', 'success');
+            }).catch(() => {
+                showStatus('❌ Не удалось скопировать. Выделите и скопируйте вручную.', 'error');
+            });
+        }
+
+        // Скачивание конфигурации
+        function downloadConfig() {
+            const configText = document.getElementById('configOutput').textContent;
+            if (!configText) {
+                showStatus('Сначала сгенерируйте конфигурацию', 'error');
+                return;
+            }
+
+            const blob = new Blob([configText], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'config.js';
+            a.click();
+            URL.revokeObjectURL(url);
+
+            showStatus('📥 Файл config.js скачан!', 'success');
+        }
+
+        // Показ статуса
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = \`<div class="status \${type}">\${message}</div>\`;
+        }
+
+        // Предзаполнение формы для демо
+        window.addEventListener('load', () => {
+            console.log('🔧 Страница настройки конфигурации загружена');
+            console.log('📋 Введите данные из Supabase Dashboard → Settings → API');
+        });
+    </script>
+</body>
+</html>

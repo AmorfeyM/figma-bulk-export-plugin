@@ -26,8 +26,12 @@ if (typeof PLUGIN_CONFIG !== 'undefined') {
   };
 }
 
-// API endpoint для проверки подписок
-const SUBSCRIPTION_API_URL = CONFIG.SUPABASE_URL + '/functions/v1/verify-subscription';
+// API endpoint для проверки подписок (два варианта)
+const USE_EDGE_FUNCTIONS = false; // Переключатель: true - Edge Functions, false - SQL Functions
+
+const SUBSCRIPTION_API_URL = USE_EDGE_FUNCTIONS
+  ? CONFIG.SUPABASE_URL + '/functions/v1/verify-subscription'
+  : CONFIG.SUPABASE_URL + '/rest/v1/rpc/verify_subscription';
 
 // Функция проверки конфигурации
 function checkConfiguration() {
@@ -68,7 +72,7 @@ async function getDeviceFingerprint() {
 async function checkSubscription(email, licenseKey) {
   const cacheKey = 'subscription_cache';
   const now = Date.now();
-  const WEEK_MS = CONFIG.PLUGIN.CACHE_DURATION; // 7 дней в миллисекундах
+  const WEEK_MS = 7 * 24 * 60 * 60 * 1000; // 7 дней в миллисекундах
 
   // Проверяем кэш (офлайн работа до недели)
   try {
@@ -99,19 +103,33 @@ async function checkSubscription(email, licenseKey) {
 
     console.log('Checking subscription online:', { email, fingerprint });
 
-    const response = await fetch(SUBSCRIPTION_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': CONFIG.SUPABASE.ANON_KEY,
-        'Authorization': `Bearer ${CONFIG.SUPABASE.ANON_KEY}`
-      },
-      body: JSON.stringify({
+    let response, requestBody;
+
+    if (USE_EDGE_FUNCTIONS) {
+      // Edge Functions запрос
+      requestBody = {
         email: email.toLowerCase().trim(),
         license_key: licenseKey.trim(),
         device_fingerprint: fingerprint,
-        plugin_version: CONFIG.PLUGIN.VERSION
-      })
+        plugin_version: CONFIG.PLUGIN_VERSION || '2.1.0'
+      };
+    } else {
+      // SQL Function запрос через RPC
+      requestBody = {
+        p_email: email.toLowerCase().trim(),
+        p_license_key: licenseKey.trim(),
+        p_device_fingerprint: fingerprint
+      };
+    }
+
+    response = await fetch(SUBSCRIPTION_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': CONFIG.SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${CONFIG.SUPABASE_ANON_KEY}`
+      },
+      body: JSON.stringify(requestBody)
     });
 
     if (!response.ok) {
