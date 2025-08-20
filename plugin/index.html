@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Figma Bulk Export Plugin - Скачать</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .download-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .file-list {
+            list-style: none;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .file-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .file-icon {
+            font-size: 24px;
+        }
+
+        .file-details h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .file-details p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .download-btn {
+            padding: 8px 16px;
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.3s ease;
+            font-weight: 500;
+        }
+
+        .download-btn:hover {
+            background: #45a049;
+        }
+
+        .install-instructions {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .install-steps {
+            list-style: none;
+            counter-reset: step-counter;
+        }
+
+        .install-steps li {
+            counter-increment: step-counter;
+            margin-bottom: 15px;
+            padding-left: 40px;
+            position: relative;
+        }
+
+        .install-steps li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #4CAF50;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .back-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            transition: background 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .warning {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid rgba(255, 193, 7, 0.5);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .file-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← Вернуться к экосистеме</a>
+
+        <div class="header">
+            <div class="logo">🔌</div>
+            <h1>Figma Bulk Export Plugin</h1>
+            <p class="subtitle">Скачать файлы плагина для установки в Figma</p>
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ Внимание:</strong> Этот плагин работает только в Figma Desktop. Веб-версия Figma не поддерживает экспорт файлов.
+        </div>
+
+        <div class="download-card">
+            <h2>📥 Файлы плагина</h2>
+            <p style="margin-bottom: 20px;">Скачайте все файлы для установки плагина в Figma:</p>
+
+            <ul class="file-list">
+                <li class="file-item">
+                    <div class="file-info">
+                        <span class="file-icon">📋</span>
+                        <div class="file-details">
+                            <h3>manifest.json</h3>
+                            <p>Манифест плагина (обязательный файл)</p>
+                        </div>
+                    </div>
+                    <a href="manifest.json" download class="download-btn">Скачать</a>
+                </li>
+
+                <li class="file-item">
+                    <div class="file-info">
+                        <span class="file-icon">⚙️</span>
+                        <div class="file-details">
+                            <h3>code-simple.js</h3>
+                            <p>Основной код плагина</p>
+                        </div>
+                    </div>
+                    <a href="code-simple.js" download class="download-btn">Скачать</a>
+                </li>
+
+                <li class="file-item">
+                    <div class="file-info">
+                        <span class="file-icon">🎨</span>
+                        <div class="file-details">
+                            <h3>ui-final.html</h3>
+                            <p>Пользовательский интерфейс</p>
+                        </div>
+                    </div>
+                    <a href="ui-final.html" download class="download-btn">Скачать</a>
+                </li>
+
+                <li class="file-item">
+                    <div class="file-info">
+                        <span class="file-icon">⚙️</span>
+                        <div class="file-details">
+                            <h3>config.js</h3>
+                            <p>Конфигурация плагина</p>
+                        </div>
+                    </div>
+                    <a href="config.js" download class="download-btn">Скачать</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="install-instructions">
+            <h2>🚀 Инструкция по установке</h2>
+            <ol class="install-steps">
+                <li>Скачайте все 4 файла выше в одну папку</li>
+                <li>Откройте <strong>Figma Desktop</strong> (не веб-версию)</li>
+                <li>Перейдите в меню <strong>Plugins → Development</strong></li>
+                <li>Нажмите <strong>"Import plugin from manifest"</strong></li>
+                <li>Выберите файл <code>manifest.json</code> из скачанной папки</li>
+                <li>Плагин появится в списке разработки и будет готов к использованию</li>
+            </ol>
+        </div>
+
+        <div class="download-card">
+            <h2>🔑 Получение лицензии</h2>
+            <p style="margin-bottom: 15px;">Для использования плагина нужна активная подписка:</p>
+            <ul style="list-style: disc; margin-left: 20px; margin-bottom: 20px;">
+                <li>Месячная подписка: 500₽</li>
+                <li>Квартальная подписка: 1200₽ (скидка 20%)</li>
+                <li>Годовая подписка: 4000₽ (скидка 33%)</li>
+            </ul>
+            <p>Свяжитесь с администратором для получения лицензионного ключа.</p>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; opacity: 0.8;">
+            <p>
+                <a href="/admin" style="color: white;">Админ-панель</a> |
+                <a href="/test" style="color: white;">Тестирование</a> |
+                <a href="/README.md" style="color: white;">Документация</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        console.log('🔌 Figma Bulk Export Plugin');
+        console.log('📁 Файлы плагина готовы к скачиванию');
+
+        // Автоматическое скачивание всех файлов
+        function downloadAll() {
+            const files = ['manifest.json', 'code-simple.js', 'ui-final.html', 'config.js'];
+            files.forEach((file, index) => {
+                setTimeout(() => {
+                    const link = document.createElement('a');
+                    link.href = file;
+                    link.download = file;
+                    link.click();
+                }, index * 500);
+            });
+        }
+
+        // Добавляем кнопку массового скачивания
+        const downloadCard = document.querySelector('.download-card');
+        const downloadAllBtn = document.createElement('button');
+        downloadAllBtn.textContent = '📦 Скачать все файлы';
+        downloadAllBtn.style.cssText = `
+            padding: 12px 24px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            margin-top: 20px;
+            width: 100%;
+            transition: background 0.3s ease;
+        `;
+        downloadAllBtn.onmouseover = () => downloadAllBtn.style.background = '#45a049';
+        downloadAllBtn.onmouseout = () => downloadAllBtn.style.background = '#4CAF50';
+        downloadAllBtn.onclick = downloadAll;
+        downloadCard.appendChild(downloadAllBtn);
+    </script>
+</body>
+</html>

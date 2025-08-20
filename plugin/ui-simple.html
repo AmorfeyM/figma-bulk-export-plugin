@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Экспорт по секциям</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 13px;
+      background: #2c2c2c;
+      color: #ffffff;
+      padding: 16px;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .header {
+      text-align: center;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #404040;
+    }
+
+    .button {
+      padding: 8px 16px;
+      background: #0d99ff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .button:hover {
+      background: #0b7acc;
+    }
+
+    .subscription-screen {
+      padding: 16px;
+      background: #383838;
+      border-radius: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin: 4px 0;
+      border: 1px solid #555;
+      border-radius: 4px;
+      background: #444;
+      color: white;
+    }
+
+    .error {
+      background: #ff4444;
+      color: white;
+      padding: 8px;
+      border-radius: 4px;
+      margin: 8px 0;
+    }
+
+    .success {
+      background: #44ff44;
+      color: black;
+      padding: 8px;
+      border-radius: 4px;
+      margin: 8px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Bulk Export by Sections</h1>
+    </div>
+
+    <!-- Экран подписки -->
+    <div id="subscriptionScreen" class="subscription-screen">
+      <h2>Активация подписки</h2>
+      <p>Введите данные для активации:</p>
+
+      <input type="email" id="emailInput" placeholder="Email">
+      <input type="text" id="licenseInput" placeholder="Лицензионный ключ">
+
+      <button class="button" id="activateBtn">Активировать</button>
+
+      <div id="subscriptionError" class="error" style="display: none;"></div>
+      <div id="subscriptionSuccess" class="success" style="display: none;"></div>
+    </div>
+
+    <!-- Основной интерфейс -->
+    <div id="mainInterface" style="display: none;">
+      <h2>Плагин готов к работе!</h2>
+      <button class="button" id="getSectionsBtn">Найти секции</button>
+      <div id="sectionsInfo"></div>
+      <button class="button" id="exportBtn" style="display: none;">Экспорт</button>
+      <button class="button" id="closeBtn">Закрыть</button>
+    </div>
+  </div>
+
+  <script>
+    console.log('🔌 UI Script loaded');
+
+    let hasActiveSubscription = false;
+
+    // Элементы интерфейса
+    const subscriptionScreen = document.getElementById('subscriptionScreen');
+    const mainInterface = document.getElementById('mainInterface');
+    const emailInput = document.getElementById('emailInput');
+    const licenseInput = document.getElementById('licenseInput');
+    const activateBtn = document.getElementById('activateBtn');
+    const getSectionsBtn = document.getElementById('getSectionsBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const closeBtn = document.getElementById('closeBtn');
+    const subscriptionError = document.getElementById('subscriptionError');
+    const subscriptionSuccess = document.getElementById('subscriptionSuccess');
+    const sectionsInfo = document.getElementById('sectionsInfo');
+
+    // Функции отображения сообщений
+    function showError(message) {
+      subscriptionError.textContent = message;
+      subscriptionError.style.display = 'block';
+      subscriptionSuccess.style.display = 'none';
+    }
+
+    function showSuccess(message) {
+      subscriptionSuccess.textContent = message;
+      subscriptionSuccess.style.display = 'block';
+      subscriptionError.style.display = 'none';
+    }
+
+    function hideMessages() {
+      subscriptionError.style.display = 'none';
+      subscriptionSuccess.style.display = 'none';
+    }
+
+    // Показать основной интерфейс
+    function showMainInterface() {
+      subscriptionScreen.style.display = 'none';
+      mainInterface.style.display = 'block';
+    }
+
+    // Показать экран подписки
+    function showSubscriptionScreen() {
+      subscriptionScreen.style.display = 'block';
+      mainInterface.style.display = 'none';
+    }
+
+    // Обработчики событий
+    activateBtn.addEventListener('click', () => {
+      const email = emailInput.value.trim();
+      const license = licenseInput.value.trim();
+
+      if (!email || !license) {
+        showError('Введите email и лицензионный ключ');
+        return;
+      }
+
+      activateBtn.disabled = true;
+      activateBtn.textContent = 'Проверка...';
+      hideMessages();
+
+      parent.postMessage({
+        pluginMessage: {
+          type: 'subscription-verify',
+          email: email,
+          license_key: license
+        }
+      }, '*');
+    });
+
+    getSectionsBtn.addEventListener('click', () => {
+      parent.postMessage({
+        pluginMessage: { type: 'get-sections' }
+      }, '*');
+    });
+
+    exportBtn.addEventListener('click', () => {
+      parent.postMessage({
+        pluginMessage: {
+          type: 'start-export',
+          settings: {
+            format: 'PNG',
+            scale: 2,
+            createZip: false
+          }
+        }
+      }, '*');
+    });
+
+    closeBtn.addEventListener('click', () => {
+      parent.postMessage({
+        pluginMessage: { type: 'close-plugin' }
+      }, '*');
+    });
+
+    // Обработчик сообщений от плагина
+    window.onmessage = (event) => {
+      const msg = event.data.pluginMessage;
+      console.log('📨 UI received message:', msg.type);
+
+      if (msg.type === 'subscription-status') {
+        if (msg.active) {
+          hasActiveSubscription = true;
+          showMainInterface();
+          showSuccess('Подписка активна!');
+        } else {
+          hasActiveSubscription = false;
+          showSubscriptionScreen();
+        }
+        return;
+      }
+
+      if (msg.type === 'subscription-success') {
+        hasActiveSubscription = true;
+        activateBtn.disabled = false;
+        activateBtn.textContent = 'Активировать';
+        showSuccess('Подписка успешно активирована!');
+        setTimeout(() => {
+          showMainInterface();
+        }, 1500);
+        return;
+      }
+
+      if (msg.type === 'subscription-error') {
+        activateBtn.disabled = false;
+        activateBtn.textContent = 'Активировать';
+        showError(msg.message);
+        return;
+      }
+
+      if (msg.type === 'sections-found') {
+        const count = msg.sections.length;
+        sectionsInfo.innerHTML = `<p>Найдено секций: ${count}</p>`;
+        exportBtn.style.display = count > 0 ? 'block' : 'none';
+        return;
+      }
+
+      if (msg.type === 'export-complete') {
+        showSuccess('Экспорт завершен!');
+        return;
+      }
+
+      if (msg.type === 'export-error') {
+        showError('Ошибка экспорта: ' + msg.message);
+        return;
+      }
+    };
+
+    // Заполнить тестовые данные
+    emailInput.value = 'test@demo.com';
+    licenseInput.value = 'TEST-FIGMA-2024-KEY1';
+
+    // Проверка подписки при загрузке
+    parent.postMessage({
+      pluginMessage: { type: 'subscription-check' }
+    }, '*');
+
+    console.log('✅ UI initialized successfully');
+  </script>
+</body>
+</html>

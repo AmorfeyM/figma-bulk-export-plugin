@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Figma Plugins Ecosystem</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 800px;
+            padding: 40px 20px;
+        }
+
+        .logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .card p {
+            opacity: 0.9;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn.primary {
+            background: #4CAF50;
+        }
+
+        .btn.primary:hover {
+            background: #45a049;
+        }
+
+        .footer {
+            margin-top: 40px;
+            opacity: 0.8;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 24px;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🎨</div>
+        <h1>Figma Plugins Ecosystem</h1>
+        <p class="subtitle">Экосистема плагинов для Figma с централизованной системой управления подписками</p>
+
+        <div class="cards">
+            <div class="card">
+                <div class="card-icon">🔌</div>
+                <h3>Figma Plugin</h3>
+                <p>Плагин для массового экспорта изображений из Figma по секциям с системой подписки</p>
+                <a href="/plugin/" class="btn">Скачать плагин</a>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">👨‍💼</div>
+                <h3>Админ-панель</h3>
+                <p>Веб-интерфейс для управления подписками, пользователями и статистикой</p>
+                <a href="/admin-panel/admin-panel.html" class="btn primary">Открыть панель</a>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">🧪</div>
+                <h3>Тестирование</h3>
+                <p>Инструменты для тестирования системы и проверки подключения к базе данных</p>
+                <a href="/admin-panel/test-final.html" class="btn">Тестировать</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>📚 <a href="/README.md">Документация</a> | 🚀 <a href="/admin-panel/DEPLOYMENT.md">Развертывание</a> | 📄 <a href="/LICENSE">Лицензия</a></p>
+        </div>
+    </div>
+
+    <script>
+        console.log('🎨 Figma Plugins Ecosystem');
+        console.log('🔗 Компоненты системы:');
+        console.log('  🔌 Plugin: /plugin/');
+        console.log('  👨‍💼 Admin: /admin-panel/');
+        console.log('  🧪 Test: /admin-panel/test-final.html');
+    </script>
+</body>
+</html>

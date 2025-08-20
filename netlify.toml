@@ -1,0 +1,42 @@
+[build]
+  publish = "."
+  command = "echo 'Static deployment ready'"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co; img-src 'self' data: https:;"
+
+[[headers]]
+  for = "/admin-panel/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+[[redirects]]
+  from = "/admin"
+  to = "/admin-panel/admin-panel.html"
+  status = 302
+
+[[redirects]]
+  from = "/test"
+  to = "/admin-panel/test-final.html"
+  status = 302
+
+[[redirects]]
+  from = "/plugin/*"
+  to = "/plugin/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/admin-panel/*"
+  to = "/admin-panel/:splat"
+  status = 200
+
+[functions]
+  # No functions needed for static deployment

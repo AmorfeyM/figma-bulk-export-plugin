@@ -1,0 +1,16 @@
+# Figma Plugins Ecosystem - Netlify Redirects
+
+# Главные маршруты
+/admin             /admin-panel/admin-panel.html                302
+/test              /admin-panel/test-final.html                 302
+/docs              /README.md                                   302
+
+# Плагин маршруты
+/plugin/*          /plugin/:splat                               200
+/admin-panel/*     /admin-panel/:splat                          200
+
+# API прокси для Supabase (если нужно)
+/api/*             https://jnxywpdrnyfmfynviggu.supabase.co/:splat  200
+
+# Fallback для SPA
+/*                 /index.html                                  200

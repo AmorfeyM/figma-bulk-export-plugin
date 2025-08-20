@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Figma Plugins Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 600px;
+            padding: 40px 20px;
+        }
+
+        .logo {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+
+        .admin-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 16px 32px;
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 500;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .btn.secondary {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .back-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .features {
+            text-align: left;
+            margin-bottom: 30px;
+        }
+
+        .features ul {
+            list-style: none;
+        }
+
+        .features li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .features li::before {
+            content: "✅";
+            position: absolute;
+            left: 0;
+        }
+
+        @media (max-width: 768px) {
+            .back-link {
+                position: relative;
+                display: block;
+                width: fit-content;
+                margin-bottom: 20px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-link">← Главная</a>
+
+    <div class="container">
+        <div class="logo">👨‍💼</div>
+        <h1>Admin Panel</h1>
+        <p class="subtitle">Централизованное управление плагинами Figma</p>
+
+        <div class="admin-card">
+            <h2 style="margin-bottom: 20px;">Возможности админ-панели</h2>
+            <div class="features">
+                <ul>
+                    <li>Управление подписками пользователей</li>
+                    <li>Создание и деактивация лицензий</li>
+                    <li>Статистика по доходам и активности</li>
+                    <li>Email уведомления пользователям</li>
+                    <li>Экспорт данных в CSV</li>
+                    <li>Поддержка нескольких плагинов</li>
+                    <li>Мониторинг системы и логов</li>
+                </ul>
+            </div>
+
+            <a href="admin-panel.html" class="btn">🚀 Открыть админ-панель</a>
+            <a href="test-final.html" class="btn secondary">🧪 Тестирование системы</a>
+        </div>
+
+        <div style="opacity: 0.8; font-size: 14px;">
+            <p>Для доступа требуется административный ключ</p>
+        </div>
+    </div>
+
+    <script>
+        console.log('👨‍💼 Figma Plugins Admin Panel');
+        console.log('🔗 Доступные страницы:');
+        console.log('  📊 Админ-панель: admin-panel.html');
+        console.log('  🧪 Тестирование: test-final.html');
+    </script>
+</body>
+</html>
